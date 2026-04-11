@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+_alembic_tmp.db
+*.db
