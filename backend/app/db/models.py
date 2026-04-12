@@ -174,6 +174,8 @@ class UnscheduledLesson(Base):
     course_title: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     enrollment: Mapped[int] = mapped_column(Integer, default=0)
 
+    schedule_run: Mapped["ScheduleRun"] = relationship(back_populates="unscheduled")
+
 
 class ScheduleChangeLog(Base):
     __tablename__ = "schedule_change_logs"

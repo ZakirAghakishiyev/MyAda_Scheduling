@@ -13,6 +13,11 @@ class InstructorDto(BaseModel):
 
 
 def fetch_instructors() -> list[InstructorDto]:
+    if settings.use_mock_data:
+        from app.mock_data.reader import load_instructors
+
+        return load_instructors()
+
     url = f"{settings.auth_base_url.rstrip('/')}/api/v1/instructors"
     with httpx.Client(timeout=settings.http_timeout_seconds) as client:
         r = client.get(url)

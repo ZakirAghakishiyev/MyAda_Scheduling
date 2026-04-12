@@ -25,6 +25,7 @@ services:
       - "5009:8000"
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/scheduling
+      USE_MOCK_DATA: ${USE_MOCK_DATA:-true}
       ATTENDANCE_BASE_URL: ${ATTENDANCE_BASE_URL:-http://host.docker.internal:5008}
       LOCATION_BASE_URL: ${LOCATION_BASE_URL:-http://host.docker.internal:5005}
       AUTH_BASE_URL: ${AUTH_BASE_URL:-http://host.docker.internal:5001}

@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,6 +11,7 @@ class Settings(BaseSettings):
     auth_base_url: str = "http://localhost:5001"
     http_timeout_seconds: float = 30.0
     dev_user_id_header: str = "X-User-Id"
+    use_mock_data: bool = Field(default=False, alias="USE_MOCK_DATA")
 
 
 settings = Settings()

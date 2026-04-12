@@ -17,6 +17,11 @@ class RoomDto(BaseModel):
 
 
 def fetch_rooms() -> list[RoomDto]:
+    if settings.use_mock_data:
+        from app.mock_data.reader import load_rooms
+
+        return load_rooms()
+
     url = f"{settings.location_base_url.rstrip('/')}/api/v1/rooms"
     with httpx.Client(timeout=settings.http_timeout_seconds) as client:
         r = client.get(url)

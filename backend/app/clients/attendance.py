@@ -27,6 +27,11 @@ class AttendanceSchedulingResponse(BaseModel):
 
 
 def fetch_lessons_for_scheduling() -> list[SchedulingLessonDto]:
+    if settings.use_mock_data:
+        from app.mock_data.reader import load_lessons
+
+        return load_lessons()
+
     url = f"{settings.attendance_base_url.rstrip('/')}/api/admin/lessons/scheduling"
     with httpx.Client(timeout=settings.http_timeout_seconds) as client:
         r = client.get(url)
