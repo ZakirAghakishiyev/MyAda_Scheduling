@@ -16,16 +16,15 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Scheduling microservice",
     version="1.0.0",
-    description=(
-        "University scheduling: generation, manual edits, instructor preferences.\n\n"
-        "**Optional Bearer (Swagger *Authorize*):** if you send `Authorization: Bearer <JWT>`, "
-        "that token is used for outbound **Attendance** calls on this request. "
-        "Otherwise the server uses `ATTENDANCE_ACCESS_TOKEN` from the environment. "
-        "Scheduling routes themselves do not require authentication."
-    ),
+    description="...",
+    
+
+    root_path="/scheduling",
+
     openapi_url="/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
+
     swagger_ui_parameters={
         "persistAuthorization": True,
         "displayRequestDuration": True,
