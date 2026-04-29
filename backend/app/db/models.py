@@ -47,7 +47,7 @@ class InstructorPreferenceProfile(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    instructor_user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    instructor_user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     academic_year: Mapped[str] = mapped_column(String(32), nullable=False)
     semester: Mapped[str] = mapped_column(String(32), nullable=False)
     strict_mode: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -123,7 +123,7 @@ class ScheduledSession(Base):
         ForeignKey("schedule_runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     lesson_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    instructor_user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    instructor_user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     room_id: Mapped[int] = mapped_column(Integer, nullable=False)
     room_name: Mapped[str] = mapped_column(String(256), nullable=False)
     timeslot_id: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -164,7 +164,7 @@ class UnscheduledLesson(Base):
         ForeignKey("schedule_runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     lesson_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    instructor_user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    instructor_user_id: Mapped[str] = mapped_column(String(64), nullable=False)
     times_per_week: Mapped[int] = mapped_column(Integer, nullable=False)
     sessions_assigned: Mapped[int] = mapped_column(Integer, nullable=False)
     sessions_needed: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -187,7 +187,7 @@ class ScheduleChangeLog(Base):
     session_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("scheduled_sessions.id", ondelete="SET NULL"), nullable=True, index=True
     )
-    actor_user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    actor_user_id: Mapped[str] = mapped_column(String(64), nullable=False)
     action: Mapped[str] = mapped_column(String(64), nullable=False)
     before_state: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     after_state: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)

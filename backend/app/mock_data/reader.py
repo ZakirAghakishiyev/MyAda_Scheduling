@@ -45,12 +45,19 @@ def load_instructors() -> list[InstructorDto]:
     with path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            raw_id = (row.get("instructor_user_id") or "").strip()
+            full_name = (row.get("full_name") or "").strip()
+            # Backward-compat: tolerate malformed rows exported as '"1,""Last, First"""'.
+            if raw_id and not full_name and "," in raw_id:
+                left, right = raw_id.split(",", 1)
+                raw_id = left.strip().strip('"')
+                full_name = right.strip().strip('"')
             out.append(
                 InstructorDto.model_validate(
-                    {"id": int(row["instructor_user_id"]), "fullName": row["full_name"]}
+                    {"id": raw_id, "fullName": full_name}
                 )
             )
-    return sorted(out, key=lambda x: x.id)
+    return sorted(out, key=lambda x: (0, int(x.id)) if x.id.isdigit() else (1, x.id))
 
 
 @lru_cache(maxsize=1)

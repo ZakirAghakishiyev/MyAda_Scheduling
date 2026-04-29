@@ -7,6 +7,7 @@ from app.db.models import ScheduledSession, ScheduleRunStatus
 from app.scheduler.timeslots import TIMESLOT_BY_ID
 from app.schemas.schedule import SessionOptionsResponse, SessionOut, SessionPatchRequest
 from app.services import audit as audit_service
+from app.services.room_labels import enrich_sessions_to_out, format_room_display
 from app.services.schedule_query import get_run_or_404
 
 
@@ -30,7 +31,7 @@ def patch_session(
     schedule_run_id: int,
     session_id: int,
     body: SessionPatchRequest,
-    actor_user_id: int,
+    actor_user_id: str,
 ) -> SessionOut:
     run = get_run_or_404(db, schedule_run_id)
     if run.status not in (ScheduleRunStatus.completed.value, ScheduleRunStatus.published.value):
@@ -83,7 +84,7 @@ def patch_session(
     before = _session_snapshot(sess)
 
     sess.room_id = new_room_id
-    sess.room_name = room.name
+    sess.room_name = format_room_display(room)
     sess.timeslot_id = new_timeslot_id
     sess.day = slot["day"]
     sess.start_time = slot["start"]
@@ -103,7 +104,7 @@ def patch_session(
     )
     db.commit()
     db.refresh(sess)
-    return SessionOut.model_validate(sess)
+    return enrich_sessions_to_out([sess], rooms)[0]
 
 
 def session_options(
@@ -145,7 +146,7 @@ def session_options(
             options.append(
                 {
                     "room_id": room.id,
-                    "room_name": room.name,
+                    "room_name": format_room_display(room),
                     "timeslot_id": ts_id,
                     "day": slot["day"],
                     "start": slot["start"],

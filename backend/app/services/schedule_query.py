@@ -1,9 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError
+from app.clients.location import fetch_rooms
+from app.core.errors import NotFoundError, ValidationAppError
+from app.core.user_ids import normalize_instructor_user_id
 from app.db.models import ScheduleRun, ScheduledSession, UnscheduledLesson
 from app.schemas.schedule import ScheduleRunDetailResponse, SessionOut, UnscheduledOut
+from app.services.room_labels import enrich_sessions_to_out, enrich_unscheduled_rows
 
 
 def get_run_or_404(db: Session, schedule_run_id: int) -> ScheduleRun:
@@ -19,17 +22,21 @@ def get_run_detail(db: Session, schedule_run_id: int) -> ScheduleRunDetailRespon
 
 
 def list_sessions(
-    db: Session, schedule_run_id: int, day: str | None, instructor_user_id: int | None
+    db: Session, schedule_run_id: int, day: str | None, instructor_user_id: str | None
 ) -> list[SessionOut]:
     get_run_or_404(db, schedule_run_id)
     q = select(ScheduledSession).where(ScheduledSession.schedule_run_id == schedule_run_id)
     if day:
         q = q.where(ScheduledSession.day == day)
-    if instructor_user_id is not None:
-        q = q.where(ScheduledSession.instructor_user_id == instructor_user_id)
+    if instructor_user_id is not None and instructor_user_id.strip() != "":
+        try:
+            iid = normalize_instructor_user_id(instructor_user_id)
+        except ValueError as e:
+            raise ValidationAppError(str(e)) from e
+        q = q.where(ScheduledSession.instructor_user_id == iid)
     q = q.order_by(ScheduledSession.day, ScheduledSession.start_time, ScheduledSession.id)
     rows = db.execute(q).scalars().all()
-    return [SessionOut.model_validate(r) for r in rows]
+    return enrich_sessions_to_out(rows, fetch_rooms())
 
 
 def list_unscheduled(db: Session, schedule_run_id: int) -> list[UnscheduledOut]:
@@ -39,4 +46,4 @@ def list_unscheduled(db: Session, schedule_run_id: int) -> list[UnscheduledOut]:
         .where(UnscheduledLesson.schedule_run_id == schedule_run_id)
         .order_by(UnscheduledLesson.id)
     ).scalars().all()
-    return [UnscheduledOut.model_validate(r) for r in rows]
+    return enrich_unscheduled_rows(rows, fetch_rooms())

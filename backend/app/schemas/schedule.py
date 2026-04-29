@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
@@ -14,7 +14,7 @@ class ScheduleGenerateRequest(BaseModel):
 class SessionOut(BaseModel):
     id: int
     lesson_id: int
-    instructor_user_id: int
+    instructor_user_id: str
     room_id: int
     room_name: str
     timeslot_id: str
@@ -34,7 +34,7 @@ class SessionOut(BaseModel):
 class UnscheduledOut(BaseModel):
     id: int
     lesson_id: int
-    instructor_user_id: int
+    instructor_user_id: str
     times_per_week: int
     sessions_assigned: int
     sessions_needed: int
@@ -92,6 +92,21 @@ class SessionOptionsResponse(BaseModel):
     options: list[dict[str, Any]]
 
 
+class PublishRequest(BaseModel):
+    """Date range for Attendance bulk session generation; weekly pattern is taken from this schedule run."""
+
+    from_date: date = Field(..., description="Inclusive start (calendar dates for generated class sessions)")
+    to_date: date = Field(..., description="Inclusive end")
+    topic: Optional[str] = Field(default=None, description="Optional topic applied to every created session")
+
+
+class AttendanceLessonGenerationOut(BaseModel):
+    lesson_id: int
+    created_count: int = 0
+    skipped_duplicate_count: int = 0
+
+
 class PublishResponse(BaseModel):
     schedule_run_id: int
     status: str
+    attendance_generations: list[AttendanceLessonGenerationOut] = Field(default_factory=list)

@@ -4,7 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.clients.attendance import fetch_lessons_for_scheduling
+from app.clients.auth_users import fetch_instructors
 from app.clients.location import fetch_rooms
+from app.core.config import settings
 from app.core.errors import UpstreamError
 from app.db.models import ScheduleRun, ScheduleRunStatus, ScheduledSession, UnscheduledLesson
 from app.scheduler.engine import LessonInput, RoomInput, build_summary, run_scheduler
@@ -12,10 +14,14 @@ from app.scheduler.timeslots import DAY_ORDER, TIMESLOTS
 from app.schemas.schedule import (
     ScheduleGenerateResponse,
     ScheduleSummary,
-    SessionOut,
-    UnscheduledOut,
 )
 from app.services import preferences as pref_service
+from app.services.room_labels import (
+    enrich_sessions_to_out,
+    enrich_unscheduled_rows,
+    format_room_display,
+    label_partial_session_dicts,
+)
 
 
 def _utcnow() -> datetime:
@@ -35,6 +41,7 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
     try:
         lesson_dtos = fetch_lessons_for_scheduling()
         room_dtos = fetch_rooms()
+        instructor_dtos = fetch_instructors()
     except Exception as e:
         run.status = ScheduleRunStatus.failed.value
         run.completed_at = _utcnow()
@@ -42,12 +49,38 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
         db.commit()
         raise
 
+    if not instructor_dtos:
+        run.status = ScheduleRunStatus.failed.value
+        run.completed_at = _utcnow()
+        run.error_message = "No instructors returned from Auth service for role Instructor"
+        db.commit()
+        raise UpstreamError(run.error_message)
+
     if not room_dtos:
         run.status = ScheduleRunStatus.failed.value
         run.completed_at = _utcnow()
         run.error_message = "No rooms returned from Location service"
         db.commit()
         raise UpstreamError(run.error_message)
+
+    instructor_ids_from_auth = {i.id for i in instructor_dtos}
+    if not settings.use_mock_data:
+        unknown_instructor_ids = sorted(
+            {
+                l.instructor_user_id
+                for l in lesson_dtos
+                if l.instructor_user_id not in instructor_ids_from_auth
+            }
+        )
+        if unknown_instructor_ids:
+            run.status = ScheduleRunStatus.failed.value
+            run.completed_at = _utcnow()
+            run.error_message = (
+                "Attendance lessons reference instructors not present in Auth role Instructor: "
+                f"{', '.join(unknown_instructor_ids[:5])}"
+            )
+            db.commit()
+            raise UpstreamError(run.error_message)
 
     instructor_ids = {l.instructor_user_id for l in lesson_dtos}
     pref_inputs = pref_service.load_engine_preferences(db, instructor_ids, academic_year, semester)
@@ -67,6 +100,7 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
         )
 
     rooms: list[RoomInput] = [{"id": r.id, "name": r.name, "capacity": r.capacity} for r in room_dtos]
+    room_by_id = {r.id: r for r in room_dtos}
 
     scheduled, unscheduled = run_scheduler(lessons, rooms, TIMESLOTS, pref_inputs, DAY_ORDER)
     summary_dict: dict = build_summary(scheduled, unscheduled)
@@ -74,13 +108,15 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
     for block in scheduled:
         seq = 0
         for sess in block.get("sessions", []):
+            rid = int(sess["room_id"])
+            room_dto = room_by_id[rid]
             db.add(
                 ScheduledSession(
                     schedule_run_id=run.id,
                     lesson_id=int(block["lesson_id"]),
-                    instructor_user_id=int(block["instructor_user_id"]),
-                    room_id=int(sess["room_id"]),
-                    room_name=str(sess["room_name"]),
+                    instructor_user_id=str(block["instructor_user_id"]),
+                    room_id=rid,
+                    room_name=format_room_display(room_dto),
                     timeslot_id=str(sess["slot_id"]),
                     day=str(sess["day"]),
                     start_time=str(sess["start"]),
@@ -100,12 +136,14 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
             UnscheduledLesson(
                 schedule_run_id=run.id,
                 lesson_id=int(block["lesson_id"]),
-                instructor_user_id=int(block["instructor_user_id"]),
+                instructor_user_id=str(block["instructor_user_id"]),
                 times_per_week=int(block["times_per_week"]),
                 sessions_assigned=int(block["sessions_assigned"]),
                 sessions_needed=int(block["sessions_needed"]),
                 reason=str(block["reason"]),
-                partial_sessions=block.get("partial_sessions"),
+                partial_sessions=label_partial_session_dicts(
+                    block.get("partial_sessions"), room_by_id
+                ),
                 course_code=block.get("course_code"),
                 course_title=block.get("course_title"),
                 enrollment=int(block.get("enrollment", 0)),
@@ -143,6 +181,6 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
         academic_year=run.academic_year,
         semester=run.semester,
         summary=summ,
-        scheduled_sessions=[SessionOut.model_validate(s) for s in sessions],
-        unscheduled_lessons=[UnscheduledOut.model_validate(u) for u in uns],
+        scheduled_sessions=enrich_sessions_to_out(sessions, room_dtos),
+        unscheduled_lessons=enrich_unscheduled_rows(uns, room_dtos),
     )

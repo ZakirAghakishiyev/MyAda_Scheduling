@@ -11,7 +11,7 @@ from app.scheduler.engine import PreferenceInput
 
 
 def get_profile(
-    db: Session, instructor_user_id: int, academic_year: str, semester: str
+    db: Session, instructor_user_id: str, academic_year: str, semester: str
 ) -> InstructorPreferenceProfile | None:
     return db.execute(
         select(InstructorPreferenceProfile).where(
@@ -40,7 +40,7 @@ def to_response(p: InstructorPreferenceProfile) -> PreferenceProfileResponse:
 
 
 def upsert_profile(
-    db: Session, instructor_user_id: int, body: PreferenceProfileUpsert
+    db: Session, instructor_user_id: str, body: PreferenceProfileUpsert
 ) -> InstructorPreferenceProfile:
     existing = get_profile(db, instructor_user_id, body.academic_year, body.semester)
     if existing:
@@ -76,7 +76,7 @@ def upsert_profile(
 
 
 def load_engine_preferences(
-    db: Session, instructor_user_ids: set[int], academic_year: str, semester: str
+    db: Session, instructor_user_ids: set[str], academic_year: str, semester: str
 ) -> list[PreferenceInput]:
     if not instructor_user_ids:
         return []

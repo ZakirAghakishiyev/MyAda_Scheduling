@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 class PreferenceProfileResponse(BaseModel):
     id: int
-    instructor_user_id: int
+    instructor_user_id: str
     academic_year: str
     semester: str
     strict: bool

@@ -8,7 +8,7 @@ def log_change(
     *,
     schedule_run_id: int,
     session_id: int | None,
-    actor_user_id: int,
+    actor_user_id: str,
     action: str,
     before_state: dict | None,
     after_state: dict | None,

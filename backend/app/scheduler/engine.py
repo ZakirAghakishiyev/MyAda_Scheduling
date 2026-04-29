@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
+from app.core.user_ids import normalize_instructor_user_id
+
 
 class RoomInput(TypedDict):
     id: int
@@ -16,7 +18,7 @@ class RoomInput(TypedDict):
 
 class LessonInput(TypedDict, total=False):
     lesson_id: int
-    instructor_user_id: int
+    instructor_user_id: str
     course_code: str
     course_title: str
     times_per_week: int
@@ -25,7 +27,7 @@ class LessonInput(TypedDict, total=False):
 
 
 class PreferenceInput(TypedDict, total=False):
-    instructor_user_id: int
+    instructor_user_id: str
     preferred_days: list[str]
     preferred_times: list[str]
     strict: bool
@@ -33,7 +35,7 @@ class PreferenceInput(TypedDict, total=False):
 
 class ScheduledLessonOut(TypedDict, total=False):
     lesson_id: int
-    instructor_user_id: int
+    instructor_user_id: str
     course_code: str
     course_title: str
     times_per_week: int
@@ -44,7 +46,7 @@ class ScheduledLessonOut(TypedDict, total=False):
 
 class UnscheduledLessonOut(TypedDict, total=False):
     lesson_id: int
-    instructor_user_id: int
+    instructor_user_id: str
     course_code: str
     course_title: str
     times_per_week: int
@@ -77,10 +79,10 @@ def _slot_score(slot: dict[str, str], pref: dict[str, Any]) -> int:
     return 2
 
 
-def _build_pref_index(prefs: list[PreferenceInput]) -> dict[int, dict[str, Any]]:
-    index: dict[int, dict[str, Any]] = {}
+def _build_pref_index(prefs: list[PreferenceInput]) -> dict[str, dict[str, Any]]:
+    index: dict[str, dict[str, Any]] = {}
     for pref in prefs:
-        uid = int(pref["instructor_user_id"])
+        uid = normalize_instructor_user_id(pref["instructor_user_id"])
         index[uid] = {
             "preferred_days": [d.capitalize() for d in pref.get("preferred_days", [])],
             "preferred_times": pref.get("preferred_times", []),
@@ -98,14 +100,14 @@ def run_scheduler(
 ) -> tuple[list[ScheduledLessonOut], list[UnscheduledLessonOut]]:
     pref_index = _build_pref_index(instructor_preferences)
     room_booked: dict[int, set[str]] = {r["id"]: set() for r in rooms}
-    instructor_booked: dict[int, set[str]] = {}
+    instructor_booked: dict[str, set[str]] = {}
     day_load: dict[str, int] = {d: 0 for d in day_order}
     scheduled: list[ScheduledLessonOut] = []
     unscheduled: list[UnscheduledLessonOut] = []
 
     for lesson in lessons:
         lesson_id = int(lesson["lesson_id"])
-        instructor_user_id = int(lesson["instructor_user_id"])
+        instructor_user_id = normalize_instructor_user_id(lesson["instructor_user_id"])
         course_code = lesson.get("course_code") or "UNKNOWN"
         course_title = lesson.get("course_title") or ""
         times_per_week = int(lesson.get("times_per_week", 1))

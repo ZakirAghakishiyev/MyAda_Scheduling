@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import DbDep, UserIdDep
+from app.clients.attendance_headers import bind_optional_upstream_bearer
 from app.core.errors import (
     ConflictError,
     NotFoundError,
@@ -11,6 +12,7 @@ from app.core.errors import (
     http_validation,
 )
 from app.schemas.schedule import (
+    PublishRequest,
     PublishResponse,
     ScheduleGenerateRequest,
     ScheduleGenerateResponse,
@@ -26,7 +28,11 @@ from app.services import schedule_generate
 from app.services import schedule_publish
 from app.services import schedule_query
 
-router = APIRouter(prefix="/schedules", tags=["schedules"])
+router = APIRouter(
+    prefix="/schedules",
+    tags=["schedules"],
+    dependencies=[Depends(bind_optional_upstream_bearer)],
+)
 
 
 @router.post("/generate", response_model=ScheduleGenerateResponse)
@@ -50,12 +56,14 @@ def get_sessions(
     schedule_run_id: int,
     db: DbDep,
     day: str | None = Query(None),
-    instructor_user_id: int | None = Query(None),
+    instructor_user_id: str | None = Query(None),
 ) -> list[SessionOut]:
     try:
         return schedule_query.list_sessions(db, schedule_run_id, day, instructor_user_id)
     except NotFoundError as e:
         raise http_not_found(e) from e
+    except ValidationAppError as e:
+        raise http_validation(e) from e
 
 
 @router.get("/{schedule_run_id}/unscheduled", response_model=list[UnscheduledOut])
@@ -106,10 +114,17 @@ def get_session_options(
 
 
 @router.post("/{schedule_run_id}/publish", response_model=PublishResponse)
-def post_publish(schedule_run_id: int, db: DbDep, user_id: UserIdDep) -> PublishResponse:
+def post_publish(
+    schedule_run_id: int,
+    body: PublishRequest,
+    db: DbDep,
+    user_id: UserIdDep,
+) -> PublishResponse:
     try:
-        return schedule_publish.publish_schedule(db, schedule_run_id, user_id)
+        return schedule_publish.publish_schedule(db, schedule_run_id, user_id, body)
     except NotFoundError as e:
         raise http_not_found(e) from e
+    except UpstreamError as e:
+        raise http_validation(ValidationAppError(e.message)) from e
     except ValidationAppError as e:
         raise http_validation(e) from e
