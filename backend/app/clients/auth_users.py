@@ -53,7 +53,17 @@ def fetch_instructors() -> list[InstructorDto]:
 
         return load_instructors()
 
+    # Prefer explicit service token; fall back to per-request Bearer from Scheduling Swagger (if present).
     token = (settings.auth_service_access_token or "").strip()
+    if not token:
+        try:
+            # Reuse the per-request token bound by bind_optional_upstream_bearer.
+            from app.clients.attendance_headers import _upstream_request_token  # type: ignore
+
+            token = (_upstream_request_token.get() or "").strip()
+        except Exception:
+            token = ""
+
     if not token:
         raise UpstreamError(
             "AUTH_SERVICE_ACCESS_TOKEN is required to list instructors from Auth "
@@ -62,7 +72,10 @@ def fetch_instructors() -> list[InstructorDto]:
         )
 
     url = _auth_users_by_role_url(settings.auth_base_url, INSTRUCTOR_ROLE)
-    headers = {"Authorization": f"Bearer {token}"}
+    if token.lower().startswith("bearer "):
+        headers = {"Authorization": token}
+    else:
+        headers = {"Authorization": f"Bearer {token}"}
     with httpx.Client(timeout=settings.http_timeout_seconds) as client:
         r = client.get(url, headers=headers)
         if r.status_code >= 400:
