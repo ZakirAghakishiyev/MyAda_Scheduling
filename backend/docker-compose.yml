@@ -30,7 +30,8 @@ services:
       ATTENDANCE_ACCESS_TOKEN: "${ATTENDANCE_ACCESS_TOKEN:-}"
       # Override with gateway, e.g. https://myada.site/location/api/v1
       LOCATION_BASE_URL: "${LOCATION_BASE_URL:-https://myada.site/location/api/v1}"
-      AUTH_BASE_URL: "${AUTH_BASE_URL:-http://host.docker.internal:5001}"
+      # Auth gateway root, e.g. https://myada.site/auth (backend calls /api/auth/... under this base)
+      AUTH_BASE_URL: "${AUTH_BASE_URL:-https://myada.site/auth}"
       AUTH_SERVICE_ACCESS_TOKEN: "${AUTH_SERVICE_ACCESS_TOKEN:-}"
       HTTP_TIMEOUT_SECONDS: "30"
     depends_on:

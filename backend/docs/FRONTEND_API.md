@@ -34,7 +34,7 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
 | `ATTENDANCE_BASE_URL` | Attendance service origin, **no trailing slash** (default deploy: `https://myada.site/attendance`; local: `http://localhost:5008` or `http://host.docker.internal:5008`). |
 | `ATTENDANCE_ACCESS_TOKEN` | Optional **JWT** (raw or `Bearer …`) sent as **`Authorization`** on every outbound Attendance request. This service’s own HTTP API does **not** require auth. |
 | `LOCATION_BASE_URL` | **Full Location API root** ending with **`/api/v1`** — see **Location service (rooms)** below. |
-| `AUTH_BASE_URL` | Auth service host (default deploy: `https://myada.site`). Used for **`/api/auth/...`** when calling Auth from the backend. |
+| `AUTH_BASE_URL` | Auth service host or gateway root (default deploy: `https://myada.site/auth`). Used for **`/api/auth/...`** when calling Auth from the backend. |
 | `AUTH_SERVICE_ACCESS_TOKEN` | **Bearer** token with **admin** role, required for **`GET /api/auth/users-by-role/Instructor`** when `USE_MOCK_DATA=false`. |
 | `HTTP_TIMEOUT_SECONDS` | HTTP client timeout for upstream calls (default `30`). |
 | `CORS_ORIGINS` | Comma-separated allowed origins, or `*` (credentials disabled for `*`). |

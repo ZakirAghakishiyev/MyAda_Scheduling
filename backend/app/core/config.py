@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     # Rooms list: {location_base_url}/rooms  e.g. http://host:5000/location/api/v1/rooms
     location_base_url: str = "https://myada.site/location/api/v1"
     # Auth: host only or gateway root, e.g. http://localhost:5001 or http://localhost:5000
-    auth_base_url: str = "https://myada.site"
+    # Deployed gateway example: https://myada.site/auth (backend calls /api/auth/... under this base)
+    auth_base_url: str = "https://myada.site/auth"
     # Admin access token for server-side GET /api/auth/users-by-role/{role} (instructors list)
     auth_service_access_token: str = Field(default="", alias="AUTH_SERVICE_ACCESS_TOKEN")
     http_timeout_seconds: float = 30.0
