@@ -31,10 +31,10 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
 |----------|---------|
 | `DATABASE_URL` | SQLAlchemy PostgreSQL URL. |
 | `USE_MOCK_DATA` | `false` (**default**): lessons from Attendance, rooms from Location, instructors from Auth (`role=Instructor`). Set `true` only to force local CSV mocks. |
-| `ATTENDANCE_BASE_URL` | Attendance service origin, **no trailing slash** (default deploy: `http://13.60.31.141:5000/attendance`; local: `http://localhost:5008` or `http://host.docker.internal:5008`). |
+| `ATTENDANCE_BASE_URL` | Attendance service origin, **no trailing slash** (default deploy: `https://myada.site/attendance`; local: `http://localhost:5008` or `http://host.docker.internal:5008`). |
 | `ATTENDANCE_ACCESS_TOKEN` | Optional **JWT** (raw or `Bearer …`) sent as **`Authorization`** on every outbound Attendance request. This service’s own HTTP API does **not** require auth. |
 | `LOCATION_BASE_URL` | **Full Location API root** ending with **`/api/v1`** — see **Location service (rooms)** below. |
-| `AUTH_BASE_URL` | Auth service host (e.g. `http://localhost:5001`). Used for **`/api/auth/...`** when calling Auth from the backend. |
+| `AUTH_BASE_URL` | Auth service host (default deploy: `https://myada.site`). Used for **`/api/auth/...`** when calling Auth from the backend. |
 | `AUTH_SERVICE_ACCESS_TOKEN` | **Bearer** token with **admin** role, required for **`GET /api/auth/users-by-role/Instructor`** when `USE_MOCK_DATA=false`. |
 | `HTTP_TIMEOUT_SECONDS` | HTTP client timeout for upstream calls (default `30`). |
 | `CORS_ORIGINS` | Comma-separated allowed origins, or `*` (credentials disabled for `*`). |
@@ -72,8 +72,8 @@ GET {LOCATION_BASE_URL}/rooms
 
 | Component | Example |
 |-----------|---------|
-| Base | `http://51.20.193.29:5000/location/api/v1` |
-| Rooms | `http://51.20.193.29:5000/location/api/v1/rooms` |
+| Base | `https://myada.site/location/api/v1` |
+| Rooms | `https://myada.site/location/api/v1/rooms` |
 
 **Direct LocationService** (no gateway): e.g. `http://localhost:5005/api/v1` → **`GET .../api/v1/rooms`**.
 
@@ -369,7 +369,7 @@ Only allowed when run **`status`** is **`completed`**. For each distinct **`less
 
 `POST {ATTENDANCE_BASE_URL}/api/admin/lessons/{lessonId}/sessions/generate`
 
-The Scheduling API accepts **`from_date` / `to_date`** (snake_case, ISO dates) in JSON; the client to Attendance sends **`fromDate` / `toDate`** (camelCase) plus **`weeklySlots`** (day + start/end times from this run). If all calls succeed, the run becomes **`published`** and an audit row is written (`action`: **`publish`**). Configure **`ATTENDANCE_BASE_URL`** (Compose default: **`http://13.60.31.141:5000/attendance`**).
+The Scheduling API accepts **`from_date` / `to_date`** (snake_case, ISO dates) in JSON; the client to Attendance sends **`fromDate` / `toDate`** (camelCase) plus **`weeklySlots`** (day + start/end times from this run). If all calls succeed, the run becomes **`published`** and an audit row is written (`action`: **`publish`**). Configure **`ATTENDANCE_BASE_URL`** (Compose default: **`https://myada.site/attendance`**).
 
 **Request body** — `PublishRequest`
 

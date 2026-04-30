@@ -6,14 +6,14 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     database_url: str = "postgresql+psycopg2://postgres:postgres@localhost:5431/scheduling"
-    attendance_base_url: str = "http://13.60.31.141:5000/attendance"
+    attendance_base_url: str = "https://myada.site/attendance"
     # Bearer (or full "Bearer …") sent on every server-side request to Attendance
     attendance_access_token: str = Field(default="", alias="ATTENDANCE_ACCESS_TOKEN")
     # LocationService JSON root. Gateway: host + /location/api/v1 (gateway strips /location when forwarding).
     # Rooms list: {location_base_url}/rooms  e.g. http://host:5000/location/api/v1/rooms
-    location_base_url: str = "http://51.20.193.29:5000/location/api/v1"
+    location_base_url: str = "https://myada.site/location/api/v1"
     # Auth: host only or gateway root, e.g. http://localhost:5001 or http://localhost:5000
-    auth_base_url: str = "http://localhost:5001"
+    auth_base_url: str = "https://myada.site"
     # Admin access token for server-side GET /api/auth/users-by-role/{role} (instructors list)
     auth_service_access_token: str = Field(default="", alias="AUTH_SERVICE_ACCESS_TOKEN")
     http_timeout_seconds: float = 30.0
