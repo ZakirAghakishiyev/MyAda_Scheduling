@@ -34,7 +34,7 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
 | `ATTENDANCE_ACCESS_TOKEN` | Optional **JWT** (raw or `Bearer …`) sent as **`Authorization`** on every outbound Attendance request. This service’s own HTTP API does **not** require auth. |
 | `LOCATION_BASE_URL` | **Full Location API root** ending with **`/api/v1`** — see **Location service (rooms)** below. |
 | `AUTH_BASE_URL` | Auth service host or gateway root (default deploy: `https://myada.site/auth`). Used for **`/api/auth/...`** when calling Auth from the backend. |
-| `AUTH_SERVICE_ACCESS_TOKEN` | **Bearer** token with **admin** role, required for **`GET /api/auth/users-by-role/Instructor`** during schedule generation (unless the Scheduling request forwards **`Authorization`** and the backend reuses it for Auth). |
+| `AUTH_SERVICE_ACCESS_TOKEN` | Optional **Bearer** token with **admin** role for **`GET /api/auth/users-by-role/Instructor`** (`app.clients.auth_users`). **`POST /schedules/generate`** does **not** call Auth; lesson **`instructorUserId`** comes from Attendance only. |
 | `HTTP_TIMEOUT_SECONDS` | HTTP client timeout for upstream calls (default `30`). |
 | `CORS_ORIGINS` | Comma-separated allowed origins, or `*` (credentials disabled for `*`). |
 | `DEV_USER_ID_HEADER` | Header name for instructor id (default **`X-User-Id`**). |
@@ -49,7 +49,7 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
 |---------|---------------------|
 | **Attendance** | **`GET /api/admin/lessons/scheduling`** — lesson catalog for **`POST /schedules/generate`**. **`POST /api/admin/lessons/{lessonId}/sessions/generate`** — called when **`POST .../publish`** runs. |
 | **Location** | **`GET {LOCATION_BASE_URL}/rooms`** — all rooms for the constraint solver (see below). |
-| **Auth** | **`GET {AUTH_BASE_URL}/api/auth/users-by-role/Instructor`** with **`Authorization: Bearer`** — builds the instructor directory for **`POST /schedules/generate`**. Lessons whose **`instructorUserId`** is **not** in that list are **not** passed to the solver; they appear only under **`unscheduled_lessons`** with a dedicated **`reason`** (the run still **`completed`**). |
+| **Auth** | **`AUTH_BASE_URL`** is available for **`/api/auth/...`** clients (e.g. **`fetch_instructors`**). **`POST /schedules/generate`** uses **Attendance + Location only**; lessons are scheduled using **`instructorUserId`** from Attendance whether or not that user exists in Auth’s Instructor role list. |
 
 ## Instructor user ids (GUIDs)
 
@@ -59,7 +59,7 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
   - a **normal Auth UUID** (whitespace trimmed, normalized to standard string form), or
   - a **legacy numeric instructor key** (e.g. `"41"` or integer **`41`** in JSON from older clients). The service maps that to the **same deterministic UUID (v5)** used for migrated rows, so filters and preferences stay consistent.
 - **Validation:** Empty or non-UUID, non-numeric values → **`400`** / **`422`** as documented per route. Pure digit strings are accepted as legacy keys, not as final storage form.
-- **Dev fixtures:** **`app/mock_data/*.csv`** and **`scripts/export_mock_csvs.py`** are optional sample exports only; **`POST /schedules/generate`** always reads lessons from **Attendance**, rooms from **Location**, and instructors from **Auth**.
+- **Dev fixtures:** **`app/mock_data/*.csv`** and **`scripts/export_mock_csvs.py`** are optional sample exports only; **`POST /schedules/generate`** reads lessons from **Attendance** and rooms from **Location**.
 - **Change logs:** **`actor_user_id`** on **`schedule_change_logs`** remains a **string** column (not `uuid`); treat it as an opaque user key unless your deployment standardizes it as a GUID string.
 
 ---
@@ -110,6 +110,8 @@ Configurable via env `DEV_USER_ID_HEADER` (default `X-User-Id`).
 If the header is missing: **`401`**. If the value is empty, not a valid UUID, and not a legacy numeric key: **`400`**. See **[Instructor user ids (GUIDs)](#instructor-user-ids-guids)**.
 
 `POST /api/v1/schedules/generate` does **not** require `X-User-Id` today (intended for admin/trusted callers).
+
+**Optional `Authorization` on `/schedules/...` routes:** Schedule routes use optional **`HTTPBearer`** (`bind_optional_upstream_bearer`). On **`POST .../generate`**, a per-request **`Authorization: Bearer <JWT>`** is reused for **Attendance** when **`ATTENDANCE_ACCESS_TOKEN`** is unset (generation does **not** call Auth). Other flows (`PATCH`, **`publish`**) may reuse the same token for Attendance as documented per handler.
 
 ---
 
@@ -194,11 +196,17 @@ Must be a subset of:
 
 ### `POST /api/v1/schedules/generate`
 
-Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}/api/admin/lessons/scheduling`**), **rooms** from Location (**`GET {LOCATION_BASE_URL}/rooms`**), and **instructors** from Auth (**`GET {AUTH_BASE_URL}/api/auth/users-by-role/Instructor`**). Persists a new **schedule run** and returns the full result.
+Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}/api/admin/lessons/scheduling`**) and **rooms** from Location (**`GET {LOCATION_BASE_URL}/rooms`**). **Every** lesson from Attendance is passed to the solver, including when **`instructorUserId`** does not exist in Auth’s Instructor directory. Persists a new **schedule run** and returns the full result.
 
-**Instructor directory vs solver:** Only lessons whose **`instructor_user_id`** (from Attendance, after normalization) appears in the Auth **Instructor** response are scheduled. Others are returned as **`unscheduled_lessons`** with **`sessions_assigned`** `0`, **`sessions_needed`** equal to **`times_per_week`**, empty **`partial_sessions`**, and **`reason`** starting with *Instructor user id is not listed under Auth role Instructor*. If Auth returns **no** instructors, **every** lesson is treated that way (the run still **`completed`** if upstream calls succeed).
+**Headers (optional)**
 
-**Upstream alignment:** Prefer **`instructorUserId`** equal to the Auth instructor **`id`** (canonical UUID) and to **`X-User-Id`** for preferences and UX. Legacy numeric keys are still accepted on input; mismatches with Auth only affect **eligibility for placement**, not HTTP success of **`generate`**.
+| Header | Value |
+|--------|--------|
+| **`Authorization`** | **`Bearer <JWT>`** — reused for Attendance when **`ATTENDANCE_ACCESS_TOKEN`** is unset (see **[Authentication](#authentication-current-dev-behaviour)**). |
+
+**Preferences:** Stored instructor preferences (same **`instructor_user_id`** / term) still apply when present; instructors with no profile get default solver behavior for days/times.
+
+**Upstream alignment:** Prefer **`instructorUserId`** aligned with Auth **`id`** and **`X-User-Id`** so preference edits and downstream UX match; generation does **not** require Auth.
 
 **Request body**
 
@@ -216,8 +224,8 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 | `academic_year` | string | Echo from request. |
 | `semester` | string | Echo from request. |
 | `summary` | object | See below. |
-| `scheduled_sessions` | `SessionOut[]` | Only lessons placed by the solver (known Auth instructors). |
-| `unscheduled_lessons` | `UnscheduledOut[]` | Solver failures plus lessons skipped because the instructor is missing from Auth (see **`reason`**). |
+| `scheduled_sessions` | `SessionOut[]` | Lessons the solver placed (each carries Attendance **`instructor_user_id`**). |
+| `unscheduled_lessons` | `UnscheduledOut[]` | Lessons the solver could not fully place (see **`reason`**). |
 
 `summary`:
 
@@ -231,7 +239,7 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 
 **Errors**
 
-- **`422`**: Invalid JSON body (missing `academic_year` / `semester`); **upstream errors** from Attendance, Location, or Auth during fetch (e.g. Auth **`401`**) are also surfaced as **`422`** with **`detail`** carrying the upstream message. Examples: no rooms from Location, Attendance/Auth HTTP errors. Check the **`app.http`** log line for **`errors`** and **`body`**.
+- **`422`**: Invalid JSON body (missing `academic_year` / `semester`); **upstream errors** from Attendance or Location during fetch are surfaced as **`422`** with **`detail`** carrying the upstream message (e.g. no rooms, Attendance HTTP error). Check the **`app.http`** log line for **`errors`** and **`body`**.
 - **`500`**: Unhandled failure during generation; see server logs.
 
 ---
@@ -302,7 +310,7 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 | `times_per_week` | int |
 | `sessions_assigned` | int |
 | `sessions_needed` | int |
-| `reason` | string | Includes solver messages (*No available timeslot…*) or, when the instructor is absent from Auth’s Instructor list: *Instructor user id is not listed under Auth role Instructor; lesson was not placed in the timetable.* |
+| `reason` | string | Solver explanation (e.g. *No available timeslot/room combination…*) when placement failed or was partial. |
 | `partial_sessions` | array \| null — partial slot assignments if any |
 | `course_code` | string \| null |
 | `course_title` | string \| null |
@@ -695,7 +703,7 @@ Each lesson object (camelCase in JSON) maps to the Scheduling service’s `Sched
 | Field | Type | Notes |
 |--------|------|--------|
 | `lessonId` | int | |
-| `instructorUserId` | string | **UUID** (Auth user id) preferred; **legacy numeric** JSON values normalize to a canonical UUID. For **`POST /schedules/generate`**, the lesson is scheduled only if that id appears in **`GET …/users-by-role/Instructor`**; otherwise it appears under **`unscheduled_lessons`** (generation still succeeds). Align with **`X-User-Id`** for preferences and instructor-facing flows. |
+| `instructorUserId` | string | **UUID** (Auth user id) preferred; **legacy numeric** JSON values normalize to a canonical UUID. **`POST /schedules/generate`** schedules using this id from Attendance regardless of Auth’s Instructor list; align with **`X-User-Id`** for preferences and instructor-facing flows. |
 | `enrollment` | int | Optional; default `0` |
 | `maxCapacity` | int | Room sizing; optional, default `0` |
 | `timesPerWeek` | int | Sessions to place per week |
