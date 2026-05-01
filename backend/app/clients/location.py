@@ -46,11 +46,6 @@ def _rooms_from_location_json(data: Any) -> list[RoomDto]:
 
 
 def fetch_rooms() -> list[RoomDto]:
-    if settings.use_mock_data:
-        from app.mock_data.reader import load_rooms
-
-        return load_rooms()
-
     url = _location_rooms_url(settings.location_base_url)
     try:
         with httpx.Client(timeout=settings.http_timeout_seconds) as client:

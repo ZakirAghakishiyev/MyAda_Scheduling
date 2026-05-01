@@ -30,12 +30,11 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
 | Variable | Purpose |
 |----------|---------|
 | `DATABASE_URL` | SQLAlchemy PostgreSQL URL. |
-| `USE_MOCK_DATA` | `false` (**default**): lessons from Attendance, rooms from Location, instructors from Auth (`role=Instructor`). Set `true` only to force local CSV mocks. |
 | `ATTENDANCE_BASE_URL` | Attendance service origin, **no trailing slash** (default deploy: `https://myada.site/attendance`; local: `http://localhost:5008` or `http://host.docker.internal:5008`). |
 | `ATTENDANCE_ACCESS_TOKEN` | Optional **JWT** (raw or `Bearer …`) sent as **`Authorization`** on every outbound Attendance request. This service’s own HTTP API does **not** require auth. |
 | `LOCATION_BASE_URL` | **Full Location API root** ending with **`/api/v1`** — see **Location service (rooms)** below. |
 | `AUTH_BASE_URL` | Auth service host or gateway root (default deploy: `https://myada.site/auth`). Used for **`/api/auth/...`** when calling Auth from the backend. |
-| `AUTH_SERVICE_ACCESS_TOKEN` | **Bearer** token with **admin** role, required for **`GET /api/auth/users-by-role/Instructor`** when `USE_MOCK_DATA=false`. |
+| `AUTH_SERVICE_ACCESS_TOKEN` | **Bearer** token with **admin** role, required for **`GET /api/auth/users-by-role/Instructor`** during schedule generation (unless the Scheduling request forwards **`Authorization`** and the backend reuses it for Auth). |
 | `HTTP_TIMEOUT_SECONDS` | HTTP client timeout for upstream calls (default `30`). |
 | `CORS_ORIGINS` | Comma-separated allowed origins, or `*` (credentials disabled for `*`). |
 | `DEV_USER_ID_HEADER` | Header name for instructor id (default **`X-User-Id`**). |
@@ -50,9 +49,18 @@ Configure via **`.env`** or Compose `environment` (see **`.env.example`**). Typi
 |---------|---------------------|
 | **Attendance** | **`GET /api/admin/lessons/scheduling`** — lesson catalog for **`POST /schedules/generate`**. **`POST /api/admin/lessons/{lessonId}/sessions/generate`** — called when **`POST .../publish`** runs. |
 | **Location** | **`GET {LOCATION_BASE_URL}/rooms`** — all rooms for the constraint solver (see below). |
-| **Auth** | **`GET {AUTH_BASE_URL}/api/auth/users-by-role/Instructor`** with **`Authorization: Bearer`** — used to load the instructor directory and validate lesson instructor ids during schedule generation. |
+| **Auth** | **`GET {AUTH_BASE_URL}/api/auth/users-by-role/Instructor`** with **`Authorization: Bearer`** — builds the instructor directory for **`POST /schedules/generate`**. Lessons whose **`instructorUserId`** is **not** in that list are **not** passed to the solver; they appear only under **`unscheduled_lessons`** with a dedicated **`reason`** (the run still **`completed`**). |
 
-Instructor and actor user ids are stored and returned as **strings** (Auth **UUID** or legacy numeric string) so they align with **`X-User-Id`**.
+## Instructor user ids (GUIDs)
+
+- **Database:** `instructor_user_id` on **`instructor_preference_profiles`**, **`scheduled_sessions`**, and **`unscheduled_lessons`** is stored as PostgreSQL **`uuid`** (Alembic revision **`0003_instructor_uuid`**). Run **`alembic upgrade head`** so the schema matches the API.
+- **JSON responses:** Those fields are always **canonical UUID strings** (e.g. `80f7f6d4-3ab5-5512-96f6-7d6585a2ae96`).
+- **Requests:** Headers (**`X-User-Id`**), query **`instructor_user_id`**, and Attendance **`instructorUserId`** accept either:
+  - a **normal Auth UUID** (whitespace trimmed, normalized to standard string form), or
+  - a **legacy numeric instructor key** (e.g. `"41"` or integer **`41`** in JSON from older clients). The service maps that to the **same deterministic UUID (v5)** used for migrated rows, so filters and preferences stay consistent.
+- **Validation:** Empty or non-UUID, non-numeric values → **`400`** / **`422`** as documented per route. Pure digit strings are accepted as legacy keys, not as final storage form.
+- **Dev fixtures:** **`app/mock_data/*.csv`** and **`scripts/export_mock_csvs.py`** are optional sample exports only; **`POST /schedules/generate`** always reads lessons from **Attendance**, rooms from **Location**, and instructors from **Auth**.
+- **Change logs:** **`actor_user_id`** on **`schedule_change_logs`** remains a **string** column (not `uuid`); treat it as an opaque user key unless your deployment standardizes it as a GUID string.
 
 ---
 
@@ -96,10 +104,10 @@ Endpoints **`GET` / `POST` / `PUT /api/v1/instructors/preferences`**, **`PATCH .
 
 | Header | Value |
 |--------|--------|
-| **`X-User-Id`** | **UUID string** (Auth user id, e.g. `00000000-0000-0000-0000-000000000041`) or **legacy numeric string** for mock/older data — must match `instructor_user_id` on lessons / Auth. |
+| **`X-User-Id`** | **UUID string** (Auth user id) or **legacy numeric string** — normalized to the same **canonical UUID** as **`instructor_user_id`** on lessons and instructor ids from Auth. |
 
 Configurable via env `DEV_USER_ID_HEADER` (default `X-User-Id`).  
-If the header is missing: **`401`**. If the value is not a valid UUID and not a numeric string: **`400`**.
+If the header is missing: **`401`**. If the value is empty, not a valid UUID, and not a legacy numeric key: **`400`**. See **[Instructor user ids (GUIDs)](#instructor-user-ids-guids)**.
 
 `POST /api/v1/schedules/generate` does **not** require `X-User-Id` today (intended for admin/trusted callers).
 
@@ -186,9 +194,11 @@ Must be a subset of:
 
 ### `POST /api/v1/schedules/generate`
 
-Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}/api/admin/lessons/scheduling`**), **rooms** from Location (**`GET {LOCATION_BASE_URL}/rooms`**), and **instructors** from Auth (**`GET {AUTH_BASE_URL}/api/auth/users-by-role/Instructor`**) when **`USE_MOCK_DATA=false`**; otherwise uses **`app/mock_data`** CSVs. Persists a new **schedule run** and returns the full result.
+Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}/api/admin/lessons/scheduling`**), **rooms** from Location (**`GET {LOCATION_BASE_URL}/rooms`**), and **instructors** from Auth (**`GET {AUTH_BASE_URL}/api/auth/users-by-role/Instructor`**). Persists a new **schedule run** and returns the full result.
 
-**Upstream alignment:** Lesson **`instructorUserId`** values should use the same string form as Auth (**UUID**) and as **`X-User-Id`** so preference rows apply during solving.
+**Instructor directory vs solver:** Only lessons whose **`instructor_user_id`** (from Attendance, after normalization) appears in the Auth **Instructor** response are scheduled. Others are returned as **`unscheduled_lessons`** with **`sessions_assigned`** `0`, **`sessions_needed`** equal to **`times_per_week`**, empty **`partial_sessions`**, and **`reason`** starting with *Instructor user id is not listed under Auth role Instructor*. If Auth returns **no** instructors, **every** lesson is treated that way (the run still **`completed`** if upstream calls succeed).
+
+**Upstream alignment:** Prefer **`instructorUserId`** equal to the Auth instructor **`id`** (canonical UUID) and to **`X-User-Id`** for preferences and UX. Legacy numeric keys are still accepted on input; mismatches with Auth only affect **eligibility for placement**, not HTTP success of **`generate`**.
 
 **Request body**
 
@@ -206,8 +216,8 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 | `academic_year` | string | Echo from request. |
 | `semester` | string | Echo from request. |
 | `summary` | object | See below. |
-| `scheduled_sessions` | `SessionOut[]` | |
-| `unscheduled_lessons` | `UnscheduledOut[]` | |
+| `scheduled_sessions` | `SessionOut[]` | Only lessons placed by the solver (known Auth instructors). |
+| `unscheduled_lessons` | `UnscheduledOut[]` | Solver failures plus lessons skipped because the instructor is missing from Auth (see **`reason`**). |
 
 `summary`:
 
@@ -221,7 +231,7 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 
 **Errors**
 
-- **`422`**: Invalid JSON body (missing `academic_year` / `semester`), or **`422`** from application validation (e.g. no rooms from Location). Check the **`app.http`** log line for **`errors`** and **`body`**.
+- **`422`**: Invalid JSON body (missing `academic_year` / `semester`); **upstream errors** from Attendance, Location, or Auth during fetch (e.g. Auth **`401`**) are also surfaced as **`422`** with **`detail`** carrying the upstream message. Examples: no rooms from Location, Attendance/Auth HTTP errors. Check the **`app.http`** log line for **`errors`** and **`body`**.
 - **`500`**: Unhandled failure during generation; see server logs.
 
 ---
@@ -254,7 +264,7 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 | Name | Type | Required | Notes |
 |------|------|----------|--------|
 | `day` | string | no | Exact day name, e.g. `Monday`. |
-| `instructor_user_id` | string (UUID or numeric) | no | Filter by instructor (same normalization as `X-User-Id`). |
+| `instructor_user_id` | string | no | Filter by instructor: **UUID** or **legacy numeric key** (same normalization as **`X-User-Id`**; compared against stored **`uuid`** rows). |
 
 **Response** `200` — array of **`SessionOut`**
 
@@ -262,7 +272,7 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 |--------|------|--------|
 | `id` | int | |
 | `lesson_id` | int | |
-| `instructor_user_id` | string | |
+| `instructor_user_id` | string (UUID) | Canonical form returned from DB. |
 | `room_id` | int | |
 | `room_name` | string | Built from Location **`buildingName`** + **`number`** (e.g. building ends with a single letter `A` and number `101` → **`A101`**). Resolved from current Location data on each GET. |
 | `timeslot_id` | string | See **timeslot_id** enum |
@@ -276,7 +286,7 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 | `enrollment` | int |
 | `room_capacity` | int |
 
-**Errors:** **`404`** — run not found. **`422`** — invalid `instructor_user_id` query (must be a UUID or numeric string, same rules as **`X-User-Id`**).
+**Errors:** **`404`** — run not found. **`422`** — invalid `instructor_user_id` query (must be a UUID or legacy numeric key, same rules as **`X-User-Id`**).
 
 ---
 
@@ -288,11 +298,11 @@ Runs scheduling: loads **lessons** from Attendance (**`GET {ATTENDANCE_BASE_URL}
 |--------|------|
 | `id` | int |
 | `lesson_id` | int |
-| `instructor_user_id` | string |
+| `instructor_user_id` | string (UUID) |
 | `times_per_week` | int |
 | `sessions_assigned` | int |
 | `sessions_needed` | int |
-| `reason` | string |
+| `reason` | string | Includes solver messages (*No available timeslot…*) or, when the instructor is absent from Auth’s Instructor list: *Instructor user id is not listed under Auth role Instructor; lesson was not placed in the timetable.* |
 | `partial_sessions` | array \| null — partial slot assignments if any |
 | `course_code` | string \| null |
 | `course_title` | string \| null |
@@ -413,7 +423,7 @@ OpenAPI **`operation_id`** values: **`get_instructor_preferences`**, **`post_ins
 | Field | Type |
 |--------|------|
 | `id` | int |
-| `instructor_user_id` | string |
+| `instructor_user_id` | string (UUID) |
 | `academic_year` | string |
 | `semester` | string |
 | `strict` | bool |
@@ -672,7 +682,7 @@ Response: success per API wrapper conventions.
 
 #### `GET /api/admin/lessons/scheduling`
 
-**Used by the Scheduling microservice** when `USE_MOCK_DATA` is false: loads the lesson catalog (course metadata, instructor assignment, capacity, meetings per week, enrollment) for automated timetable generation.
+**Used by the Scheduling microservice** for **`POST /schedules/generate`**: loads the lesson catalog (course metadata, instructor assignment, capacity, meetings per week, enrollment) for automated timetable generation.
 
 Response body may be any of:
 
@@ -685,7 +695,7 @@ Each lesson object (camelCase in JSON) maps to the Scheduling service’s `Sched
 | Field | Type | Notes |
 |--------|------|--------|
 | `lessonId` | int | |
-| `instructorUserId` | string (UUID recommended) | Must align with Auth user id sent as `X-User-Id` |
+| `instructorUserId` | string | **UUID** (Auth user id) preferred; **legacy numeric** JSON values normalize to a canonical UUID. For **`POST /schedules/generate`**, the lesson is scheduled only if that id appears in **`GET …/users-by-role/Instructor`**; otherwise it appears under **`unscheduled_lessons`** (generation still succeeds). Align with **`X-User-Id`** for preferences and instructor-facing flows. |
 | `enrollment` | int | Optional; default `0` |
 | `maxCapacity` | int | Room sizing; optional, default `0` |
 | `timesPerWeek` | int | Sessions to place per week |

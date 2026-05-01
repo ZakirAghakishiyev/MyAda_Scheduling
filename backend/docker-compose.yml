@@ -25,7 +25,6 @@ services:
       - "5010:8000"
     environment:
       DATABASE_URL: "postgresql+psycopg2://postgres:postgres@postgres:5432/scheduling"
-      USE_MOCK_DATA: "${USE_MOCK_DATA:-false}"
       ATTENDANCE_BASE_URL: "${ATTENDANCE_BASE_URL:-https://myada.site/attendance}"
       ATTENDANCE_ACCESS_TOKEN: "${ATTENDANCE_ACCESS_TOKEN:-}"
       # Override with gateway, e.g. https://myada.site/location/api/v1

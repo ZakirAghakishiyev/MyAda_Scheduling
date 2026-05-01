@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     auth_service_access_token: str = Field(default="", alias="AUTH_SERVICE_ACCESS_TOKEN")
     http_timeout_seconds: float = 30.0
     dev_user_id_header: str = "X-User-Id"
-    use_mock_data: bool = Field(default=False, alias="USE_MOCK_DATA")
     # Comma-separated origins, or "*" for any origin (credentials disabled for "*")
     cors_origins: str = Field(default="*", alias="CORS_ORIGINS")
 

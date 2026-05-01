@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from app.clients.attendance import fetch_lessons_for_scheduling
 from app.clients.auth_users import fetch_instructors
 from app.clients.location import fetch_rooms
-from app.core.config import settings
 from app.core.errors import UpstreamError
 from app.db.models import ScheduleRun, ScheduleRunStatus, ScheduledSession, UnscheduledLesson
 from app.scheduler.engine import LessonInput, RoomInput, build_summary, run_scheduler
@@ -49,13 +48,6 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
         db.commit()
         raise
 
-    if not instructor_dtos:
-        run.status = ScheduleRunStatus.failed.value
-        run.completed_at = _utcnow()
-        run.error_message = "No instructors returned from Auth service for role Instructor"
-        db.commit()
-        raise UpstreamError(run.error_message)
-
     if not room_dtos:
         run.status = ScheduleRunStatus.failed.value
         run.completed_at = _utcnow()
@@ -64,29 +56,16 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
         raise UpstreamError(run.error_message)
 
     instructor_ids_from_auth = {i.id for i in instructor_dtos}
-    if not settings.use_mock_data:
-        unknown_instructor_ids = sorted(
-            {
-                l.instructor_user_id
-                for l in lesson_dtos
-                if l.instructor_user_id not in instructor_ids_from_auth
-            }
-        )
-        if unknown_instructor_ids:
-            run.status = ScheduleRunStatus.failed.value
-            run.completed_at = _utcnow()
-            run.error_message = (
-                "Attendance lessons reference instructors not present in Auth role Instructor: "
-                f"{', '.join(unknown_instructor_ids[:5])}"
-            )
-            db.commit()
-            raise UpstreamError(run.error_message)
+    lessons_known_instructor = [l for l in lesson_dtos if l.instructor_user_id in instructor_ids_from_auth]
+    lessons_without_auth_instructor = [
+        l for l in lesson_dtos if l.instructor_user_id not in instructor_ids_from_auth
+    ]
 
-    instructor_ids = {l.instructor_user_id for l in lesson_dtos}
+    instructor_ids = {l.instructor_user_id for l in lessons_known_instructor}
     pref_inputs = pref_service.load_engine_preferences(db, instructor_ids, academic_year, semester)
 
     lessons: list[LessonInput] = []
-    for l in lesson_dtos:
+    for l in lessons_known_instructor:
         lessons.append(
             {
                 "lesson_id": l.lesson_id,
@@ -103,6 +82,28 @@ def generate_schedule(db: Session, academic_year: str, semester: str) -> Schedul
     room_by_id = {r.id: r for r in room_dtos}
 
     scheduled, unscheduled = run_scheduler(lessons, rooms, TIMESLOTS, pref_inputs, DAY_ORDER)
+
+    skipped_no_auth_instructor: list[dict] = [
+        {
+            "lesson_id": l.lesson_id,
+            "instructor_user_id": l.instructor_user_id,
+            "course_code": l.course_code,
+            "course_title": l.course_title,
+            "times_per_week": l.times_per_week,
+            "enrollment": l.enrollment,
+            "max_capacity": l.max_capacity,
+            "sessions_assigned": 0,
+            "sessions_needed": l.times_per_week,
+            "reason": (
+                "Instructor user id is not listed under Auth role Instructor; "
+                "lesson was not placed in the timetable."
+            ),
+            "partial_sessions": [],
+        }
+        for l in lessons_without_auth_instructor
+    ]
+    unscheduled = skipped_no_auth_instructor + unscheduled
+
     summary_dict: dict = build_summary(scheduled, unscheduled)
 
     for block in scheduled:

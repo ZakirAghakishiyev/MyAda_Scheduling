@@ -15,6 +15,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    Uuid,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -47,7 +48,7 @@ class InstructorPreferenceProfile(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    instructor_user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    instructor_user_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), nullable=False, index=True)
     academic_year: Mapped[str] = mapped_column(String(32), nullable=False)
     semester: Mapped[str] = mapped_column(String(32), nullable=False)
     strict_mode: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -123,7 +124,7 @@ class ScheduledSession(Base):
         ForeignKey("schedule_runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     lesson_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    instructor_user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    instructor_user_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), nullable=False, index=True)
     room_id: Mapped[int] = mapped_column(Integer, nullable=False)
     room_name: Mapped[str] = mapped_column(String(256), nullable=False)
     timeslot_id: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -164,7 +165,7 @@ class UnscheduledLesson(Base):
         ForeignKey("schedule_runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     lesson_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    instructor_user_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    instructor_user_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), nullable=False)
     times_per_week: Mapped[int] = mapped_column(Integer, nullable=False)
     sessions_assigned: Mapped[int] = mapped_column(Integer, nullable=False)
     sessions_needed: Mapped[int] = mapped_column(Integer, nullable=False)

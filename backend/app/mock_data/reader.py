@@ -57,7 +57,7 @@ def load_instructors() -> list[InstructorDto]:
                     {"id": raw_id, "fullName": full_name}
                 )
             )
-    return sorted(out, key=lambda x: (0, int(x.id)) if x.id.isdigit() else (1, x.id))
+    return sorted(out, key=lambda x: x.id)
 
 
 @lru_cache(maxsize=1)
@@ -71,7 +71,7 @@ def load_lessons() -> list[SchedulingLessonDto]:
                 SchedulingLessonDto.model_validate(
                     {
                         "lessonId": int(row["lesson_id"]),
-                        "instructorUserId": int(row["instructor_user_id"]),
+                        "instructorUserId": (row["instructor_user_id"] or "").strip(),
                         "enrollment": 0,
                         "maxCapacity": int(row["available_seats"]),
                         "timesPerWeek": int(row["lessons_per_week"]),

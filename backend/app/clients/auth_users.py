@@ -8,7 +8,7 @@ INSTRUCTOR_ROLE = "Instructor"
 
 
 class InstructorDto(BaseModel):
-    """Instructor identity from Auth (id is typically a GUID string) or mock CSV."""
+    """Instructor identity from Auth (id is typically a GUID string)."""
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
@@ -48,11 +48,6 @@ def _instructor_from_auth_user(u: AuthUserListItem) -> InstructorDto:
 
 
 def fetch_instructors() -> list[InstructorDto]:
-    if settings.use_mock_data:
-        from app.mock_data.reader import load_instructors
-
-        return load_instructors()
-
     # Prefer explicit service token; fall back to per-request Bearer from Scheduling Swagger (if present).
     token = (settings.auth_service_access_token or "").strip()
     if not token:
@@ -68,7 +63,7 @@ def fetch_instructors() -> list[InstructorDto]:
         raise UpstreamError(
             "AUTH_SERVICE_ACCESS_TOKEN is required to list instructors from Auth "
             "(GET /api/auth/users-by-role/Instructor is admin-protected). "
-            "Set the token, or enable USE_MOCK_DATA."
+            "Set the token, or pass Authorization Bearer from this API when calling generate."
         )
 
     url = _auth_users_by_role_url(settings.auth_base_url, INSTRUCTOR_ROLE)

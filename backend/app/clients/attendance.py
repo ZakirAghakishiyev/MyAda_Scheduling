@@ -60,11 +60,6 @@ def _lessons_from_attendance_json(data: Any) -> list[SchedulingLessonDto]:
 
 
 def fetch_lessons_for_scheduling() -> list[SchedulingLessonDto]:
-    if settings.use_mock_data:
-        from app.mock_data.reader import load_lessons
-
-        return load_lessons()
-
     url = f"{settings.attendance_base_url.rstrip('/')}/api/admin/lessons/scheduling"
     try:
         with httpx.Client(timeout=settings.http_timeout_seconds) as client:
@@ -76,8 +71,7 @@ def fetch_lessons_for_scheduling() -> list[SchedulingLessonDto]:
         raise UpstreamError(
             f"Cannot connect to Attendance at {url} ({e}). "
             "Start the Attendance API on that host/port, or set ATTENDANCE_BASE_URL. "
-            "For Docker→host on Windows/macOS the default is host.docker.internal. "
-            "To skip external services locally, set USE_MOCK_DATA=true."
+            "For Docker→host on Windows/macOS the default is host.docker.internal."
         ) from e
     except httpx.TimeoutException as e:
         raise UpstreamError(f"Attendance request timed out: {url}") from e

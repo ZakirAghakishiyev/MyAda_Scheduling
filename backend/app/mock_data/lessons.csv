@@ -1,103 +1,103 @@
 lesson_id,course_title,subject_description,course_number,crn,instructor,available_seats,lessons_per_week,instructor_user_id
-1,Computer Science,Computer Science,1001,10099,"Sadili, Nuraddin(Primary)",39,3,41
-2,Programming Principles I,Computer Science,1101,10520,"Aliyev, Azar(Primary)",40,2,5
-3,Programming Principles I,Computer Science,1101,10898,"Aliyev, Azar(Primary)",40,2,5
-4,Programming Principles I,Computer Science,1101,10899,"Aliyev, Azar(Primary)",41,2,5
-5,Programming Principles I,Computer Science,1101,10900,"Medvediev, Mykhailo(Primary)",40,2,36
-6,Programming Principles I,Computer Science,1101,10901,"Ahmadov, Mahmud(Primary)",40,2,4
-7,Programming Principles I,Computer Science,1101,10902,"Hajisoy, Minura(Primary)",40,2,21
-8,Programming Principles I,Computer Science,1101,10903,"Medvediev, Mykhailo(Primary)",40,2,36
-9,Programming Principles I,Computer Science,1101,10943,"Hasanzada, Azar(Primary)",40,2,26
-10,Intro to Computer Networks,Computer Science,2303,10100,"Mammadov, Orkhan(Primary)",41,2,33
-11,Intro to Computer Networks,Computer Science,2303,10101,"Mammadov, Orkhan(Primary)",38,2,33
-12,Intro to Computer Networks,Computer Science,2303,10102,"Mammadov, Orkhan(Primary)",43,2,33
-13,Intro to Computer Networks,Computer Science,2303,10103,"Mammadov, Orkhan(Primary)",35,2,33
-14,Human-Computer Interaction,Computer Science,2405,10872,"Guluzada, Lala(Primary)",40,2,17
-15,Computer Org. & Architecture,Computer Science,2406,10104,"Burns, John Thomas(Primary)",49,2,15
-16,Computer Org. & Architecture,Computer Science,2406,10105,"Burns, John Thomas(Primary)",41,2,15
-17,Computer Graphics,Computer Science,2408,10106,"Yusubov, Araz(Primary)Aliyev, Azar",40,2,46
-18,Computer Graphics,Computer Science,2408,10107,"Yusubov, Araz(Primary)Aliyev, Azar",36,2,46
-19,Intro to Software Engineering,Computer Science,3509,10108,"Ismayilova, Kamila(Primary)",40,2,30
-20,Intro to Software Engineering,Computer Science,3509,10938,"Ismayilova, Kamila(Primary)",35,2,30
-21,Artificial Intelligence,Computer Science,3613,10110,"Mammadov, Samir(Primary)",37,2,34
-22,Artificial Intelligence,Computer Science,3613,10111,"Mammadov, Samir(Primary)",35,2,34
-23,Database Systems,Computer Science,3615,10112,"Hasanov, Jamaladdin(Primary)",40,2,24
-24,Database Systems,Computer Science,3615,10113,"Imanov, Nurlan(Primary)",41,2,28
-25,Machine Learning,Computer Science,4734,10551,"Mammadov, Samir(Primary)",40,2,34
-26,Machine Learning,Computer Science,4734,10859,"Mammadov, Samir(Primary)",40,2,34
-27,Software Fundamentals,Computer Science,6201,11042,"Guvvatli, Fidan(Primary)",20,2,20
-28,Machine Intelligence,Computer Science,6210,11033,"Guvvatli, Fidan(Primary)",25,2,20
-29,Design&Analysis of Algorithms,Computer Science,6212,10114,"Medvediev, Mykhailo(Primary)",20,2,36
-30,Advanced Software Paradigms,Computer Science,6221,10115,"Hasanov, Jamaladdin(Primary)",20,2,24
-31,Advanced Machine Learning,Computer Science,6365,11043,"Guvvatli, Fidan(Primary)",20,2,20
-32,Unix Systems Administration,Computer Science,6418,11034,"Guvvatli, Fidan(Primary)",25,2,20
-33,Computer Systems Architecture,Computer Science,6461,10116,"Burns, John Thomas(Primary)",20,2,15
-34,Network Security,Computer Science,6541,11045,"Guvvatli, Fidan(Primary)",20,2,20
-35,Special Topics: NLP for Health,Computer Science,6910,11044,"Guvvatli, Fidan(Primary)",20,2,20
-36,Web & Mobile I,Information Technology,2302,10210,"Sadili, Nuraddin(Primary)",40,2,41
-37,Web & Mobile I,Information Technology,2302,10211,"Sadili, Nuraddin(Primary)",40,2,41
-38,Principles of Distributed Systems,Information Technology,3507,10212,"Burns, John Thomas(Primary)",45,2,15
-39,Cyber Security Fundamentals,Information Technology,3508,10213,"Aliyev, Rashad(Primary)",34,2,6
-40,Cyber Security Fundamentals,Information Technology,3508,10861,"Aliyev, Rashad(Primary)",35,2,6
-41,IT Project Management,Information Technology,3609,10214,"Yusubov, Araz(Primary)",33,2,45
-42,IT Project Management,Information Technology,3609,10862,"Yusubov, Araz(Primary)",30,2,45
-43,Cryptography & Network Security,Information Technology,4733,10215,"Musayev, Vugar(Primary)",30,2,38
-44,Intro to Big Data Analytics,Information Technology,4836,10216,"Suleymanov, Umid(Primary)",40,2,42
-45,Intro to Big Data Analytics,Information Technology,4836,10546,"Suleymanov, Umid(Primary)",54,2,42
-46,Princ. of Distributed Systems,Information Technology,6000,11028,"Burns, John Thomas(Primary)",12,2,15
-47,Fundamentals of Business,Business Administration,1100,10782,"Ismayilova, Gulzar",41,2,29
-48,Fundamentals of Business,Business Administration,1100,10783,"Allazov, Elvin",60,2,8
-49,Fundamentals of Business,Business Administration,1100,10784,"Allazov, Elvin",60,2,8
-50,Entrepreneurship,Business Administration,3600,11002,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,22
-51,Entrepreneurship,Business Administration,3600,11003,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,22
-52,Entrepreneurship,Business Administration,3600,11004,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,22
-53,Entrepreneurship,Business Administration,3600,11005,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,22
-54,Fundamentals of Intern. Bus.,Business Administration,4700,10224,"Brankovic, Azra",35,2,14
-55,E-Commerce Business,Business Administration,4703,10928,"Eyvazov, Elnur",40,2,16
-56,Business Policy & Strategy - Capstone I,Business Administration,4790,10055,"Aliyev, Ruslan",35,2,7
-57,Business Policy & Strategy - Capstone I,Business Administration,4790,10056,"Hamelin, Nicolas",35,2,23
-58,Leadership & Org. Behaviour,Business Administration,6100,10058,"Hasanov, Vusal",30,2,25
-59,Global Corporate Strategy,Business Administration,6101,10059,"Maharramov, Ramil",30,2,32
-60,Entrepreneurship,Business Administration,6300,10060,"Bodewes, Wynand",30,2,13
-61,Introduction to Economics,Economics,1100,10908,"Mirishov, Kamil",30,2,37
-62,Introduction to Economics,Economics,1100,10909,"Heydarova, Nargiz",30,2,27
-63,Introduction to Economics,Economics,1100,10910,"Heydarova, Nargiz",30,2,27
-64,Introduction to Economics,Economics,1100,10911,"Mammadrzayev, Vusal",30,2,35
-65,Principles of Microeconomics,Economics,1101,10119,"Heydarova, Nargiz",50,2,27
-66,Principles of Microeconomics,Economics,1101,10120,"Heydarova, Nargiz",50,2,27
-67,Principles of Microeconomics,Economics,1101,10509,"Mammadrzayev, Vusal",50,2,35
-68,Principles of Microeconomics,Economics,1101,10510,"Mammadrzayev, Vusal",50,2,35
-69,Principles of Microeconomics,Economics,1101,10946,"Babayeva, Kamala",50,2,9
-70,Principles of Microeconomics,Economics,1101,10947,"Mammadrzayev, Vusal",24,2,35
-71,Principles of Microeconomics,Economics,1101,10997,"Bakhshaliyeva, Aydan",40,2,11
-72,Principles of Economics I,Economics,1103,10121,"Rustamova, Narmina",42,2,40
-73,Principles of Economics I,Economics,1103,10122,"Rustamova, Narmina",42,2,40
-74,Principles of Economics I,Economics,1103,10123,"Bandad, Aysel",42,2,12
-75,Principles of Economics I,Economics,1103,10124,"Bandad, Aysel",42,2,12
-76,Principles of Economics I,Economics,1103,10125,"Bakhshaliyeva, Aydan",65,2,11
-77,Principles of Macroeconomics,Economics,1202,10127,"Babazade, Amin",40,2,10
-78,Principles of Economics II,Economics,2101,10848,"Rustamova, Narmina",37,2,40
-79,Principles of Economics II,Economics,2101,10849,"Rustamova, Narmina",37,2,40
-80,Principles of Economics II,Economics,2101,10850,"Bandad, Aysel",37,2,12
-81,Principles of Economics II,Economics,2101,10851,"Yeshilirmak, Muharrem",37,2,43
-82,Principles of Economics II,Economics,2101,10852,"Gunesh, Ali",37,2,18
-83,International Trade,Economics,3500,10130,"Yeshilirmak, Muharrem",40,2,43
-84,Econometrics I,Economics,3501,10131,"Aliyev, Ruslan",44,2,7
-85,Econometrics I,Economics,3501,10132,"Yusifzada, Tural",43,2,44
-86,Game Theory,Economics,3600,10781,"Keskin, Kerim",40,2,31
-87,Game Theory,Economics,3600,11048,"Abizada, Azar",35,2,2
-88,Public Finance,Economics,3601,10523,"Yeshilirmak, Muharrem",40,2,43
-89,"Money, Banking & Fin. Markets",Economics,4700,10134,"Nurmammadov, Elkin",40,2,39
-90,Labor Economics,Economics,4702,10135,"Gunesh, Ali",40,2,18
-91,Growth & Development,Economics,4703,10136,"Gunesh, Ali",30,2,18
-92,Economic Development,Economics,4712,10138,"Heydarova, Nargiz",50,2,27
-93,Topics in Microeconomics: Conflict Resolution,Economics,4715,10139,"Keskin, Kerim",30,2,31
-94,History of Economic Thought,Economics,4716,10140,"Abushov, Kavus",32,2,3
-95,Azerbaijani Economy,Economics,4801,10141,"Abizada, Azar",40,2,2
-96,International Trade & Finance,Economics,4802,10142,"Heydarova, Nargiz",45,2,27
-97,International Trade & Finance,Economics,4802,10143,"Babazade, Amin",45,2,10
-98,Managerial Economics*,Economics,5100,10144,"Gurbanov, Sarvar",30,2,19
-99,Managerial Economics,Economics,5101,10145,"Gunesh, Ali",20,2,18
-100,Managerial Economics,Economics,5102,10146,"Babazade, Amin",30,2,10
-101,Managerial Economics,Economics,5102,10147,"Gurbanov, Sarvar",33,2,19
-102,Econometrics for Management,Economics,5203,10962,"Abbasli, NIjat",25,2,1
+1,Computer Science,Computer Science,1001,10099,"Sadili, Nuraddin(Primary)",39,3,80f7f6d4-3ab5-5512-96f6-7d6585a2ae96
+2,Programming Principles I,Computer Science,1101,10520,"Aliyev, Azar(Primary)",40,2,6bf96180-65b9-53df-9b9b-643395309848
+3,Programming Principles I,Computer Science,1101,10898,"Aliyev, Azar(Primary)",40,2,6bf96180-65b9-53df-9b9b-643395309848
+4,Programming Principles I,Computer Science,1101,10899,"Aliyev, Azar(Primary)",41,2,6bf96180-65b9-53df-9b9b-643395309848
+5,Programming Principles I,Computer Science,1101,10900,"Medvediev, Mykhailo(Primary)",40,2,10a166a0-1436-5aa0-b03b-e10a5f5ec292
+6,Programming Principles I,Computer Science,1101,10901,"Ahmadov, Mahmud(Primary)",40,2,f151ecbc-a591-5940-b7e0-7e55496c5ffa
+7,Programming Principles I,Computer Science,1101,10902,"Hajisoy, Minura(Primary)",40,2,fce9dbf1-9533-57c2-a8d3-9788bb60896a
+8,Programming Principles I,Computer Science,1101,10903,"Medvediev, Mykhailo(Primary)",40,2,10a166a0-1436-5aa0-b03b-e10a5f5ec292
+9,Programming Principles I,Computer Science,1101,10943,"Hasanzada, Azar(Primary)",40,2,d88121ef-7150-5e60-a8d5-35ba68713409
+10,Intro to Computer Networks,Computer Science,2303,10100,"Mammadov, Orkhan(Primary)",41,2,49658e0e-bce9-5cb1-af13-eafa8ed8cd81
+11,Intro to Computer Networks,Computer Science,2303,10101,"Mammadov, Orkhan(Primary)",38,2,49658e0e-bce9-5cb1-af13-eafa8ed8cd81
+12,Intro to Computer Networks,Computer Science,2303,10102,"Mammadov, Orkhan(Primary)",43,2,49658e0e-bce9-5cb1-af13-eafa8ed8cd81
+13,Intro to Computer Networks,Computer Science,2303,10103,"Mammadov, Orkhan(Primary)",35,2,49658e0e-bce9-5cb1-af13-eafa8ed8cd81
+14,Human-Computer Interaction,Computer Science,2405,10872,"Guluzada, Lala(Primary)",40,2,c10b7393-7bd7-56f4-a138-0ae6d16c902a
+15,Computer Org. & Architecture,Computer Science,2406,10104,"Burns, John Thomas(Primary)",49,2,247f1b23-7987-5b23-9f4f-5861a8051cd7
+16,Computer Org. & Architecture,Computer Science,2406,10105,"Burns, John Thomas(Primary)",41,2,247f1b23-7987-5b23-9f4f-5861a8051cd7
+17,Computer Graphics,Computer Science,2408,10106,"Yusubov, Araz(Primary)Aliyev, Azar",40,2,b7239845-3e02-5860-85a7-1392dc623c40
+18,Computer Graphics,Computer Science,2408,10107,"Yusubov, Araz(Primary)Aliyev, Azar",36,2,b7239845-3e02-5860-85a7-1392dc623c40
+19,Intro to Software Engineering,Computer Science,3509,10108,"Ismayilova, Kamila(Primary)",40,2,04b385ae-293c-5ea2-a3c0-a69cd212e36f
+20,Intro to Software Engineering,Computer Science,3509,10938,"Ismayilova, Kamila(Primary)",35,2,04b385ae-293c-5ea2-a3c0-a69cd212e36f
+21,Artificial Intelligence,Computer Science,3613,10110,"Mammadov, Samir(Primary)",37,2,e47633cd-1dd7-5d81-abbe-9edd344305aa
+22,Artificial Intelligence,Computer Science,3613,10111,"Mammadov, Samir(Primary)",35,2,e47633cd-1dd7-5d81-abbe-9edd344305aa
+23,Database Systems,Computer Science,3615,10112,"Hasanov, Jamaladdin(Primary)",40,2,e02e4fd9-60b7-5187-9b31-1452abb836ab
+24,Database Systems,Computer Science,3615,10113,"Imanov, Nurlan(Primary)",41,2,84f6d3ec-4142-5a86-8fe5-2687f8605dcd
+25,Machine Learning,Computer Science,4734,10551,"Mammadov, Samir(Primary)",40,2,e47633cd-1dd7-5d81-abbe-9edd344305aa
+26,Machine Learning,Computer Science,4734,10859,"Mammadov, Samir(Primary)",40,2,e47633cd-1dd7-5d81-abbe-9edd344305aa
+27,Software Fundamentals,Computer Science,6201,11042,"Guvvatli, Fidan(Primary)",20,2,979c3d86-6241-5497-82bd-abbaff251c3c
+28,Machine Intelligence,Computer Science,6210,11033,"Guvvatli, Fidan(Primary)",25,2,979c3d86-6241-5497-82bd-abbaff251c3c
+29,Design&Analysis of Algorithms,Computer Science,6212,10114,"Medvediev, Mykhailo(Primary)",20,2,10a166a0-1436-5aa0-b03b-e10a5f5ec292
+30,Advanced Software Paradigms,Computer Science,6221,10115,"Hasanov, Jamaladdin(Primary)",20,2,e02e4fd9-60b7-5187-9b31-1452abb836ab
+31,Advanced Machine Learning,Computer Science,6365,11043,"Guvvatli, Fidan(Primary)",20,2,979c3d86-6241-5497-82bd-abbaff251c3c
+32,Unix Systems Administration,Computer Science,6418,11034,"Guvvatli, Fidan(Primary)",25,2,979c3d86-6241-5497-82bd-abbaff251c3c
+33,Computer Systems Architecture,Computer Science,6461,10116,"Burns, John Thomas(Primary)",20,2,247f1b23-7987-5b23-9f4f-5861a8051cd7
+34,Network Security,Computer Science,6541,11045,"Guvvatli, Fidan(Primary)",20,2,979c3d86-6241-5497-82bd-abbaff251c3c
+35,Special Topics: NLP for Health,Computer Science,6910,11044,"Guvvatli, Fidan(Primary)",20,2,979c3d86-6241-5497-82bd-abbaff251c3c
+36,Web & Mobile I,Information Technology,2302,10210,"Sadili, Nuraddin(Primary)",40,2,80f7f6d4-3ab5-5512-96f6-7d6585a2ae96
+37,Web & Mobile I,Information Technology,2302,10211,"Sadili, Nuraddin(Primary)",40,2,80f7f6d4-3ab5-5512-96f6-7d6585a2ae96
+38,Principles of Distributed Systems,Information Technology,3507,10212,"Burns, John Thomas(Primary)",45,2,247f1b23-7987-5b23-9f4f-5861a8051cd7
+39,Cyber Security Fundamentals,Information Technology,3508,10213,"Aliyev, Rashad(Primary)",34,2,e7eea3a9-c209-5d2d-ae90-0e9c23ddfdf5
+40,Cyber Security Fundamentals,Information Technology,3508,10861,"Aliyev, Rashad(Primary)",35,2,e7eea3a9-c209-5d2d-ae90-0e9c23ddfdf5
+41,IT Project Management,Information Technology,3609,10214,"Yusubov, Araz(Primary)",33,2,296eef0b-965b-5fad-a7a5-87c371e5628e
+42,IT Project Management,Information Technology,3609,10862,"Yusubov, Araz(Primary)",30,2,296eef0b-965b-5fad-a7a5-87c371e5628e
+43,Cryptography & Network Security,Information Technology,4733,10215,"Musayev, Vugar(Primary)",30,2,ee5a2e16-a6e3-5718-98fd-9363efa06107
+44,Intro to Big Data Analytics,Information Technology,4836,10216,"Suleymanov, Umid(Primary)",40,2,085d3061-98e9-5d78-bb22-5c2809a5e371
+45,Intro to Big Data Analytics,Information Technology,4836,10546,"Suleymanov, Umid(Primary)",54,2,085d3061-98e9-5d78-bb22-5c2809a5e371
+46,Princ. of Distributed Systems,Information Technology,6000,11028,"Burns, John Thomas(Primary)",12,2,247f1b23-7987-5b23-9f4f-5861a8051cd7
+47,Fundamentals of Business,Business Administration,1100,10782,"Ismayilova, Gulzar",41,2,fa5188e1-d778-5045-9f00-202c2c5f18b6
+48,Fundamentals of Business,Business Administration,1100,10783,"Allazov, Elvin",60,2,88537bcd-2530-593b-bd04-009db56bf898
+49,Fundamentals of Business,Business Administration,1100,10784,"Allazov, Elvin",60,2,88537bcd-2530-593b-bd04-009db56bf898
+50,Entrepreneurship,Business Administration,3600,11002,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,efd182cf-579e-5b49-97cf-2e934f7ec971
+51,Entrepreneurship,Business Administration,3600,11003,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,efd182cf-579e-5b49-97cf-2e934f7ec971
+52,Entrepreneurship,Business Administration,3600,11004,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,efd182cf-579e-5b49-97cf-2e934f7ec971
+53,Entrepreneurship,Business Administration,3600,11005,"Hajizada, Samir, Damirli, Huseyn, Levy Macedo, Alberto",30,2,efd182cf-579e-5b49-97cf-2e934f7ec971
+54,Fundamentals of Intern. Bus.,Business Administration,4700,10224,"Brankovic, Azra",35,2,13da5a91-ae4d-5c1d-a40b-9d136a977a63
+55,E-Commerce Business,Business Administration,4703,10928,"Eyvazov, Elnur",40,2,fcfde0ee-9c8d-5ff6-bca5-8f1512aee4a0
+56,Business Policy & Strategy - Capstone I,Business Administration,4790,10055,"Aliyev, Ruslan",35,2,cbbb3510-ea0a-565a-98b1-be278911c1e5
+57,Business Policy & Strategy - Capstone I,Business Administration,4790,10056,"Hamelin, Nicolas",35,2,830bebe4-4902-53b2-bce5-d4da58461c11
+58,Leadership & Org. Behaviour,Business Administration,6100,10058,"Hasanov, Vusal",30,2,46992468-3b72-54f8-b8f7-c7fd294622e8
+59,Global Corporate Strategy,Business Administration,6101,10059,"Maharramov, Ramil",30,2,24c91843-6733-5faf-b913-d59d7d9e328a
+60,Entrepreneurship,Business Administration,6300,10060,"Bodewes, Wynand",30,2,a4d2474a-1af8-5a59-a1ea-dd8307049a91
+61,Introduction to Economics,Economics,1100,10908,"Mirishov, Kamil",30,2,6162a3be-4c1b-553f-95a3-c49232ab8926
+62,Introduction to Economics,Economics,1100,10909,"Heydarova, Nargiz",30,2,513ecbbb-76dd-5c95-bd78-1311b830fab1
+63,Introduction to Economics,Economics,1100,10910,"Heydarova, Nargiz",30,2,513ecbbb-76dd-5c95-bd78-1311b830fab1
+64,Introduction to Economics,Economics,1100,10911,"Mammadrzayev, Vusal",30,2,305cd961-9af5-5f36-9e9d-ce334813f319
+65,Principles of Microeconomics,Economics,1101,10119,"Heydarova, Nargiz",50,2,513ecbbb-76dd-5c95-bd78-1311b830fab1
+66,Principles of Microeconomics,Economics,1101,10120,"Heydarova, Nargiz",50,2,513ecbbb-76dd-5c95-bd78-1311b830fab1
+67,Principles of Microeconomics,Economics,1101,10509,"Mammadrzayev, Vusal",50,2,305cd961-9af5-5f36-9e9d-ce334813f319
+68,Principles of Microeconomics,Economics,1101,10510,"Mammadrzayev, Vusal",50,2,305cd961-9af5-5f36-9e9d-ce334813f319
+69,Principles of Microeconomics,Economics,1101,10946,"Babayeva, Kamala",50,2,ac80ef74-088c-5dcb-b2bc-b74bc378db56
+70,Principles of Microeconomics,Economics,1101,10947,"Mammadrzayev, Vusal",24,2,305cd961-9af5-5f36-9e9d-ce334813f319
+71,Principles of Microeconomics,Economics,1101,10997,"Bakhshaliyeva, Aydan",40,2,5a0611e4-c297-5541-82ab-fa7746aa81e4
+72,Principles of Economics I,Economics,1103,10121,"Rustamova, Narmina",42,2,0d755d25-9235-591a-89c6-ef8a37df1a5c
+73,Principles of Economics I,Economics,1103,10122,"Rustamova, Narmina",42,2,0d755d25-9235-591a-89c6-ef8a37df1a5c
+74,Principles of Economics I,Economics,1103,10123,"Bandad, Aysel",42,2,806b4d24-0b8a-58d6-af9d-a13290fd6801
+75,Principles of Economics I,Economics,1103,10124,"Bandad, Aysel",42,2,806b4d24-0b8a-58d6-af9d-a13290fd6801
+76,Principles of Economics I,Economics,1103,10125,"Bakhshaliyeva, Aydan",65,2,5a0611e4-c297-5541-82ab-fa7746aa81e4
+77,Principles of Macroeconomics,Economics,1202,10127,"Babazade, Amin",40,2,3d12e2a9-c5c8-5808-9d69-a1437087c74e
+78,Principles of Economics II,Economics,2101,10848,"Rustamova, Narmina",37,2,0d755d25-9235-591a-89c6-ef8a37df1a5c
+79,Principles of Economics II,Economics,2101,10849,"Rustamova, Narmina",37,2,0d755d25-9235-591a-89c6-ef8a37df1a5c
+80,Principles of Economics II,Economics,2101,10850,"Bandad, Aysel",37,2,806b4d24-0b8a-58d6-af9d-a13290fd6801
+81,Principles of Economics II,Economics,2101,10851,"Yeshilirmak, Muharrem",37,2,58de23ef-c3d5-5e9e-81a5-2005263355f7
+82,Principles of Economics II,Economics,2101,10852,"Gunesh, Ali",37,2,c7b3d1fd-5c92-5e6f-82a1-ca75fd73b146
+83,International Trade,Economics,3500,10130,"Yeshilirmak, Muharrem",40,2,58de23ef-c3d5-5e9e-81a5-2005263355f7
+84,Econometrics I,Economics,3501,10131,"Aliyev, Ruslan",44,2,cbbb3510-ea0a-565a-98b1-be278911c1e5
+85,Econometrics I,Economics,3501,10132,"Yusifzada, Tural",43,2,d6587268-9be6-587a-b8c2-e6226a03cc60
+86,Game Theory,Economics,3600,10781,"Keskin, Kerim",40,2,5703ef70-050d-5b24-91d8-28458d111da2
+87,Game Theory,Economics,3600,11048,"Abizada, Azar",35,2,6a251b6c-1ce2-5c23-929b-0f6847f2cd17
+88,Public Finance,Economics,3601,10523,"Yeshilirmak, Muharrem",40,2,58de23ef-c3d5-5e9e-81a5-2005263355f7
+89,"Money, Banking & Fin. Markets",Economics,4700,10134,"Nurmammadov, Elkin",40,2,dd260c5a-805e-5919-af16-66ed9d6c3199
+90,Labor Economics,Economics,4702,10135,"Gunesh, Ali",40,2,c7b3d1fd-5c92-5e6f-82a1-ca75fd73b146
+91,Growth & Development,Economics,4703,10136,"Gunesh, Ali",30,2,c7b3d1fd-5c92-5e6f-82a1-ca75fd73b146
+92,Economic Development,Economics,4712,10138,"Heydarova, Nargiz",50,2,513ecbbb-76dd-5c95-bd78-1311b830fab1
+93,Topics in Microeconomics: Conflict Resolution,Economics,4715,10139,"Keskin, Kerim",30,2,5703ef70-050d-5b24-91d8-28458d111da2
+94,History of Economic Thought,Economics,4716,10140,"Abushov, Kavus",32,2,e4faea16-a550-5446-81c0-693c0d198b91
+95,Azerbaijani Economy,Economics,4801,10141,"Abizada, Azar",40,2,6a251b6c-1ce2-5c23-929b-0f6847f2cd17
+96,International Trade & Finance,Economics,4802,10142,"Heydarova, Nargiz",45,2,513ecbbb-76dd-5c95-bd78-1311b830fab1
+97,International Trade & Finance,Economics,4802,10143,"Babazade, Amin",45,2,3d12e2a9-c5c8-5808-9d69-a1437087c74e
+98,Managerial Economics*,Economics,5100,10144,"Gurbanov, Sarvar",30,2,90c60396-bcb1-515f-be42-7a650036622f
+99,Managerial Economics,Economics,5101,10145,"Gunesh, Ali",20,2,c7b3d1fd-5c92-5e6f-82a1-ca75fd73b146
+100,Managerial Economics,Economics,5102,10146,"Babazade, Amin",30,2,3d12e2a9-c5c8-5808-9d69-a1437087c74e
+101,Managerial Economics,Economics,5102,10147,"Gurbanov, Sarvar",33,2,90c60396-bcb1-515f-be42-7a650036622f
+102,Econometrics for Management,Economics,5203,10962,"Abbasli, NIjat",25,2,986d0db5-cd33-58ca-84df-219287eafcc1

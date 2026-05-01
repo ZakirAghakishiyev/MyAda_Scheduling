@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from uuid import uuid5
+
+from app.core.user_ids import LEGACY_INSTRUCTOR_USER_ID_NAMESPACE
+
 # Each row: lesson_id, course_title, subject_description, course_number, crn, instructor, available_seats, lessons_per_week
 _RAW: list[tuple[int, str, str, str, str, str, int, int]] = [
     (1, "Computer Science", "Computer Science", "1001", "10099", "Sadili, Nuraddin(Primary)", 39, 3),
@@ -149,7 +153,10 @@ def lesson_rows() -> list[tuple[int, str, str, str, str, str, int, int]]:
     return list(_RAW)
 
 
-def instructor_name_to_id() -> dict[str, int]:
-    """Stable synthetic user ids: only instructors appearing in mock lessons, sorted by name."""
+def instructor_name_to_id() -> dict[str, str]:
+    """Stable GUIDs per instructor (legacy index 1..N), matching normalize_instructor_user_id numeric mapping."""
     names = sorted({row[5] for row in _RAW})
-    return {name: idx + 1 for idx, name in enumerate(names)}
+    return {
+        name: str(uuid5(LEGACY_INSTRUCTOR_USER_ID_NAMESPACE, f"legacy-instructor:{idx + 1}"))
+        for idx, name in enumerate(names)
+    }
